@@ -2,4 +2,5 @@ require_relative "game"
 
 puts "Hangman"
 
-Game.new
+game = Game.new
+game.play
