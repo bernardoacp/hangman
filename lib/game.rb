@@ -74,6 +74,9 @@ class Game
   def prompt_guess
     system "clear"
 
+    print "#{@temp}\n\n" unless @temp.nil?
+    @temp = nil
+
     print "Enter \"save\" to save game and \"quit\" to quit\n\n"
 
     print "Remaining wrong guesses: #{@remaining_guesses}\n\n"
@@ -91,11 +94,16 @@ class Game
 
     if guess == "save"
       File.open("game_save.yml", "w") { |f| f.write to_yaml }
+      @temp = "Game saved."
+      return
     end
 
     exit if guess == "quit"
 
-    return if (@guesses.include? guess) || (guess.length != 1) || !guess.match?(/[A-Za-z]/)
+    if (@guesses.include? guess) || (guess.length != 1) || !guess.match?(/[A-Za-z]/)
+      @temp = "Invalid guess."
+      return
+    end
 
     if @word.include? guess
       @word.length.times do |idx|
