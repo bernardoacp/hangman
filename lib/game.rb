@@ -1,5 +1,16 @@
+require "yaml"
+
 class Game
-  def initialize
+  def initialize(new = true, word = nil, state = nil, guesses = nil, remaining_guesses = nil)
+
+    if new == false
+      @word = word
+      @state = state
+      @guesses = guesses
+      @remaining_guesses = remaining_guesses
+      return
+    end
+
     words = []
     lines = File.readlines("google-10000-english-no-swears.txt")
     lines.each do |line|
@@ -10,6 +21,20 @@ class Game
     @state = Array.new(@word.length, "_")
     @guesses = []
     @remaining_guesses = 7
+  end
+
+  def to_yaml
+    YAML.dump ({
+      word: @word,
+      state: @state,
+      guesses: @guesses,
+      remaining_guesses: @remaining_guesses
+    })
+  end
+
+  def self.from_yaml(string)
+    data = YAML.load string
+    self.new(false, data[:word], data[:state], data[:guesses], data[:remaining_guesses])
   end
 
   def play
@@ -48,6 +73,9 @@ class Game
 
   def prompt_guess
     system "clear"
+
+    print "Enter \"save\" to save game and \"quit\" to quit\n\n"
+
     print "Remaining wrong guesses: #{@remaining_guesses}\n\n"
     unless @guesses.empty?
       puts "Guesses:"
@@ -60,6 +88,12 @@ class Game
 
   def evaluate_guess
     guess = prompt_guess
+
+    if guess == "save"
+      File.open("game_save.yml", "w") { |f| f.write to_yaml }
+    end
+
+    exit if guess == "quit"
 
     return if (@guesses.include? guess) || (guess.length != 1) || !guess.match?(/[A-Za-z]/)
 
