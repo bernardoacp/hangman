@@ -61,7 +61,7 @@ class Game
   def evaluate_guess
     guess = prompt_guess
 
-    return if @guesses.include? guess
+    return if (@guesses.include? guess) || (guess.length != 1) || !guess.match?(/[A-Za-z]/)
 
     if @word.include? guess
       @word.length.times do |idx|
